@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tab Accessibility Example</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      line-height: 1.6;
+    }
+
+    .box {
+      padding: 15px;
+      margin: 10px 0;
+      background: #f4f4f4;
+      border: 2px solid #ccc;
+    }
+
+    /* Custom highlight style for focused elements */
+    :focus-visible {
+      outline: 4px solid #ff5722;
+      outline-offset: 2px;
+      background-color: #ffe0b2;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Keyboard Tab Accessibility</h1>
+  <p>Press the <strong>Tab</strong> key to move focus through the elements below.</p>
+
+  <!-- Natively focusable element -->
+  <button>Standard Button</button>
+
+  <!-- Non-interactive element made focusable via JavaScript/HTML -->
+  <div class="box" id="custom-div" tabindex="0">
+    This is a normal &lt;div&gt; made focusable with tabindex="0".
+  </div>
+
+  <!-- Natively focusable link -->
+  <p><a href="#">This is an accessible link</a></p>
+
+  <script>
+    // Optional JavaScript to dynamically add focus capability or log focus events
+    const customDiv = document.getElementById('custom-div');
+    
+    customDiv.addEventListener('focus', () => {
+      console.log('Custom div is now focused via Tab key.');
+    });
+  </script>
+
+</body>
+</html>
