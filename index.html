@@ -1,54 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Tab Accessibility Example</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      line-height: 1.6;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Layer Grid Navigation</title>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+        }
 
-    .box {
-      padding: 15px;
-      margin: 10px 0;
-      background: #f4f4f4;
-      border: 2px solid #ccc;
-    }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
 
-    /* Custom highlight style for focused elements */
-    :focus-visible {
-      outline: 4px solid #ff5722;
-      outline-offset: 2px;
-      background-color: #ffe0b2;
-    }
-  </style>
+        .controls {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        .hint {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .grid-layer {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .grid-layer.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1.02);
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 4px;
+            font-size: 1.25rem;
+        }
+
+        .sub-heading {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 12px;
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.15s;
+        }
+
+        /* Focus styles tied to custom active layer states */
+        #layer-a.active .cell.focused {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+            color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        #layer-b.active .cell.focused {
+            border-color: var(--secondary-color);
+            background-color: #ecfdf5;
+            color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Keyboard Tab Accessibility</h1>
-  <p>Press the <strong>Tab</strong> key to move focus through the elements below.</p>
+    <div class="controls">
+        <button id="toggle-btn">Switch Layer (Tab)</button>
+        <span class="hint">Active layer handles directional controls</span>
+    </div>
 
-  <!-- Natively focusable element -->
-  <button>Standard Button</button>
+    <div class="container">
+        <!-- Layer A: Arrow Keys Navigation -->
+        <div id="layer-a" class="grid-layer active">
+            <h2>Layer A</h2>
+            <div class="sub-heading">Use Arrow Keys</div>
+            <div class="grid" id="grid-a">
+                <div class="cell" data-index="0">A1</div>
+                <div class="cell" data-index="1">A2</div>
+                <div class="cell" data-index="2">A3</div>
+                <div class="cell" data-index="3">A4</div>
+                <div class="cell" data-index="4">A5</div>
+                <div class="cell" data-index="5">A6</div>
+                <div class="cell" data-index="6">A7</div>
+                <div class="cell" data-index="7">A8</div>
+                <div class="cell" data-index="8">A9</div>
+            </div>
+        </div>
 
-  <!-- Non-interactive element made focusable via JavaScript/HTML -->
-  <div class="box" id="custom-div" tabindex="0">
-    This is a normal &lt;div&gt; made focusable with tabindex="0".
-  </div>
+        <!-- Layer B: WASD Keys Navigation -->
+        <div id="layer-b" class="grid-layer">
+            <h2>Layer B</h2>
+            <div class="sub-heading">Use W, A, S, D Keys</div>
+            <div class="grid" id="grid-b">
+                <div class="cell" data-index="0">B1</div>
+                <div class="cell" data-index="1">B2</div>
+                <div class="cell" data-index="2">B3</div>
+                <div class="cell" data-index="3">B4</div>
+                <div class="cell" data-index="4">B5</div>
+                <div class="cell" data-index="5">B6</div>
+                <div class="cell" data-index="6">B7</div>
+                <div class="cell" data-index="7">B8</div>
+                <div class="cell" data-index="8">B9</div>
+            </div>
+        </div>
+    </div>
 
-  <!-- Natively focusable link -->
-  <p><a href="#">This is an accessible link</a></p>
+    <script>
+        const layerA = document.getElementById('layer-a');
+        const layerB = document.getElementById('layer-b');
+        const toggleBtn = document.getElementById('toggle-btn');
 
-  <script>
-    // Optional JavaScript to dynamically add focus capability or log focus events
-    const customDiv = document.getElementById('custom-div');
-    
-    customDiv.addEventListener('focus', () => {
-      console.log('Custom div is now focused via Tab key.');
-    });
-  </script>
+        const COLS = 3;
+        const ROWS = 3;
 
+        // Track current focused index for each layer independently
+        let state = {
+            activeLayer: 'A', // 'A' or 'B'
+            posA: 0,          // 0-8
+            posB: 0           // 0-8
+        };
+
+        // Initialize display focus
+        updateFocusVisuals();
+
+        // Switch active layer function
+        function toggleLayer() {
+            state.activeLayer = state.activeLayer === 'A' ? 'B' : 'A';
+            
+            if (state.activeLayer === 'A') {
+                layerA.classList.add('active');
+                layerB.classList.remove('active');
+            } else {
+                layerB.classList.add('active');
+                layerA.classList.remove('active');
+            }
+            updateFocusVisuals();
+        }
+
+        // Calculate 2D grid index movements
+        function moveFocus(direction) {
+            let currentPos = state.activeLayer === 'A' ? state.posA : state.posB;
+            let row = Math.floor(currentPos / COLS);
+            let col = currentPos % COLS;
+
+            switch (direction) {
+                case 'UP':    row = Math.max(0, row - 1); break;
+                case 'DOWN':  row = Math.min(ROWS - 1, row + 1); break;
+                case 'LEFT':  col = Math.max(0, col - 1); break;
+                case 'RIGHT': col = Math.min(COLS - 1, col + 1); break;
+            }
+
+            let newPos = row * COLS + col;
+            
+            if (state.activeLayer === 'A') {
+                state.posA = newPos;
+            } else {
+                state.posB = newPos;
+            }
+            updateFocusVisuals();
+        }
+
+        // Update class styling based on current state indices
+        function updateFocusVisuals() {
+            // Clear prior styling classes
+            document.querySelectorAll('.cell').forEach(cell => cell.classList.remove('focused'));
+
+            // Apply style to active element on Layer A
+            const cellA = layerA.querySelector(`[data-index="${state.posA}"]`);
+            if (cellA) cellA.classList.add('focused');
+
+            // Apply style to active element on Layer B
+            const cellB = layerB.querySelector(`[data-index="${state.posB}"]`);
+            if (cellB) cellB.classList.add('focused');
+        }
+
+        // Button Listener
+        toggleBtn.addEventListener('click', (e) => {
+            toggleLayer();
+            toggleBtn.blur(); // Remove native browser button focus loop
+        });
+
+        // Keyboard Handler
+        window.addEventListener('keydown', (e) => {
+            // Trap Tab key to switch layers
+            if (e.key === 'Tab') {
+                e.preventDefault(); // Stop default browser focus switching tabs
+                toggleLayer();
+                return;
+            }
+
+            // Route key controls depending on which layer is structurally active
+            if (state.activeLayer === 'A') {
+                switch (e.key) {
+                    case 'ArrowUp':    e.preventDefault(); moveFocus('UP'); break;
+                    case 'ArrowDown':  e.preventDefault(); moveFocus('DOWN'); break;
+                    case 'ArrowLeft':  e.preventDefault(); moveFocus('LEFT'); break;
+                    case 'ArrowRight': e.preventDefault(); moveFocus('RIGHT'); break;
+                }
+            } else if (state.activeLayer === 'B') {
+                switch (e.key.toLowerCase()) {
+                    case 'w': moveFocus('UP'); break;
+                    case 's': moveFocus('DOWN'); break;
+                    case 'a': moveFocus('LEFT'); break;
+                    case 'd': moveFocus('RIGHT'); break;
+                }
+            }
+        });
+
+        // Mouse selection integration (Optional)
+        document.querySelectorAll('.grid-layer').forEach(layer => {
+            layer.addEventListener('click', (e) => {
+                const cell = e.target.closest('.cell');
+                if (!cell) return;
+                
+                const targetLayer = layer.id === 'layer-a' ? 'A' : 'B';
+                const index = parseInt(cell.dataset.index);
+
+                if (state.activeLayer !== targetLayer) {
+                    toggleLayer();
+                }
+
+                if (targetLayer === 'A') state.posA = index;
+                else state.posB = index;
+
+                updateFocusVisuals();
+            });
+        });
+    </script>
 </body>
 </html>
